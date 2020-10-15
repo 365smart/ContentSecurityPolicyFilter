@@ -10,7 +10,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,7 +160,7 @@ public class ContentSecurityPolicyFilter implements Filter {
 
     private String getParameterValue(FilterConfig filterConfig, String paramName, String defaultValue) {
         String value = filterConfig.getInitParameter(paramName);
-        if (StringUtils.isBlank(value)) {
+        if (isBlank(value)) {
             value = defaultValue;
         }
         return value;
@@ -204,13 +203,13 @@ public class ContentSecurityPolicyFilter implements Filter {
     }
 
     private void addDirectiveToContentSecurityPolicy(StringBuilder contentSecurityPolicy, String directiveName, String value) {
-        if (StringUtils.isNotBlank(value) && !defaultSrc.equals(value)) {
+        if (isNotBlank(value) && !defaultSrc.equals(value)) {
             contentSecurityPolicy.append("; ").append(directiveName).append(" ").append(value);
         }
     }
 
     private void addSandoxDirectiveToContentSecurityPolicy(StringBuilder contentSecurityPolicy, String value) {
-        if (StringUtils.isNotBlank(value)) {
+        if (isNotBlank(value)) {
             if ("true".equalsIgnoreCase(value)) {
                 contentSecurityPolicy.append("; ").append(SANDBOX);
             } else {
@@ -221,6 +220,25 @@ public class ContentSecurityPolicyFilter implements Filter {
 
     public void destroy() {
         //not needed
+    }
+
+    static boolean isBlank(CharSequence cs) {
+        int strLen;
+        if (cs != null && (strLen = cs.length()) != 0) {
+            for (int i = 0; i < strLen; ++i) {
+                if (!Character.isWhitespace(cs.charAt(i))) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return true;
+        }
+    }
+
+    static boolean isNotBlank(CharSequence cs) {
+        return !isBlank(cs);
     }
 
 }
